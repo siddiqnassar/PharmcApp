@@ -110,4 +110,11 @@ public class UserDetailsModel {
         this.accountId = accountId;
     }
 
+    @Override
+    public String toString() {
+        return "{id:" + id + ", firstName:" + firstName + ", lastName:" + lastName + ", email:" + email
+                + ", mobileNo:" + mobileNo + ", gender:" + gender + ", deliveryId:"
+                + deliveryId + ", accountId:" + accountId + "}";
+    }
+
 }
