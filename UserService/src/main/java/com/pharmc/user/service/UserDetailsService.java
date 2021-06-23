@@ -37,12 +37,13 @@ public class UserDetailsService{
             UserDetailsModel registerUserData = userDetailsRepository.save(userDetailRequest);
             System.out.println("registerUserData is "+registerUserData);
             if(registerUserData == null) {
-                response.put("error_msg","fail");
+                response.put("registrationStatusMessage","Fail");
             }else {
-                response.put("userdata", registerUserData.toString());
+                response.put("registrationStatusMessage","Success");
+                response.put("id", registerUserData.getId());
             }
         }else {
-            response.put("error_msg","emailAlreadyExists");
+            response.put("registrationStatusMessage","User already exists");
         }
         return response.toString();
     }
@@ -64,12 +65,13 @@ public class UserDetailsService{
         if(userDetails !=null) {
             Boolean isPasswordMatched = encoder.matches(userDetailRequest.getPassword(), userDetails.getPassword());
             if(isPasswordMatched == true) {
-                response.put("userdetails", userDetails.toString());
+                response.put("id", userDetails.getId());
+                response.put("loginStatusMessage", "Success");
             }else {
-                response.put("error_msg", "invalid password");
+                response.put("loginStatusMessage", "Invalid Pwd");
             }
         } else {
-            response.put("error_msg", "no user exists");
+            response.put("loginStatusMessage", "Fail");
         }
         return response.toString();
     }
@@ -82,10 +84,14 @@ public class UserDetailsService{
         System.out.println("userDetailrequest "+findById(userDetailRequest.getId()));
         ObjectNode response = mapper.createObjectNode();
         if(findById(userDetailRequest.getId()) != null) {
-            userDetailsRepository.updateUserInfo(userDetailRequest.getId(),userDetailRequest.getEmail(),userDetailRequest.getFirstName(),userDetailRequest.getGender(),userDetailRequest.getLastName(),userDetailRequest.getMobileNo());
-            response.put("status","success");
+            int updateStatus = userDetailsRepository.updateUserInfo(userDetailRequest.getId(),userDetailRequest.getFirstName(),userDetailRequest.getLastName(),userDetailRequest.getGender(),userDetailRequest.getMobileNo(),userDetailRequest.getDeliveryId(),userDetailRequest.getAccountId());
+            if(updateStatus == 1) {
+                response.put("updateStatus","Success");
+            }else {
+                response.put("updateStatus","Fail");
+            }
         } else {
-            response.put("status","fail");
+            response.put("updateStatus","Invalid User");
         }
         return response.toString();
     }
@@ -99,5 +105,21 @@ public class UserDetailsService{
             response.put("status","fail");
         }
         return response.toString();   
+    }
+
+    @Transactional
+    public String changePassword(UserDetailsModel userDetailRequest) {
+        ObjectNode response = mapper.createObjectNode();
+        if(findById(userDetailRequest.getId()) != null) {
+            int updateStatus = userDetailsRepository.changePassword(userDetailRequest.getId(),userDetailRequest.getPassword());
+            if(updateStatus == 1) {
+                response.put("updateStatus","Success");
+            }else {
+                response.put("updateStatus","Fail");
+            }
+        } else {
+            response.put("updateStatus","Invalid User");
+        }
+        return response.toString();
     }
 }

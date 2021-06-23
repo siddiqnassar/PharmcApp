@@ -23,19 +23,24 @@ public class UserDetailsController {
     @Autowired
     UserDetailsService userDetailsService;
     
-    @GetMapping("/getuser/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<String> getUser(@PathVariable long id){
         return new ResponseEntity<String>(userDetailsService.getDetailsById(id).toString(), HttpStatus.OK);
     }
-    @PostMapping("/register")
+    @PostMapping("/")
     public ResponseEntity<String> registerUser(@RequestBody UserDetailsModel userDetailRequest){
         userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
         return new ResponseEntity<String>(userDetailsService.registerUser(userDetailRequest).toString(), HttpStatus.OK);
     }
-    @PutMapping("/update")
+    @PutMapping("/")
     public ResponseEntity<String> updateUser(@RequestBody UserDetailsModel userDetailRequest){
         //userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
         return new ResponseEntity<String>(userDetailsService.updateUser(userDetailRequest).toString(), HttpStatus.OK);
+    }
+    @PutMapping("/changepwd")
+    public ResponseEntity<String> updatePassword(@RequestBody UserDetailsModel userDetailRequest){
+        userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
+        return new ResponseEntity<String>(userDetailsService.changePassword(userDetailRequest).toString(), HttpStatus.OK);
     }
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserDetailsModel userDetailRequest){
