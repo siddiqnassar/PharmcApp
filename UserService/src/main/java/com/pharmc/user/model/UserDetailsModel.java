@@ -112,9 +112,9 @@ public class UserDetailsModel {
 
     @Override
     public String toString() {
-        return "{\"id\":" + id + ",\"firstName\":" + firstName + ",\"lastName\":" + lastName + ",\"email\":" + email
-                + ",\"mobileNo\":" + mobileNo + ",\"gender\":" + gender + ",\"deliveryId\":"
-                + deliveryId + ",\"accountId\":" + accountId + "}";
+        return "{\"id\": \"" + id + "\",\"firstName\": \"" + firstName + "\",\"lastName\": \"" + lastName + "\",\"email\": \"" + email
+                + "\",\"mobileNo\": \"" + mobileNo + "\",\"gender\": \"" + gender + "\",\"deliveryId\": \""
+                + deliveryId + "\",\"accountId\": \"" + accountId + "\"}";
     }
 
 }

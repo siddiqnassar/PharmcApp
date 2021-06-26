@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.pharmc.user.model.LoginResponse;
+import com.pharmc.user.model.RegisterResponse;
+import com.pharmc.user.model.UpdatePasswordStatus;
+import com.pharmc.user.model.UpdateUserStatus;
 import com.pharmc.user.model.UserDetailsModel;
 import com.pharmc.user.repository.UserDetailsRepository;
 
@@ -16,6 +20,16 @@ public class UserDetailsService{
 
     @Autowired
     UserDetailsRepository userDetailsRepository;
+    @Autowired
+    LoginResponse loginResponse;
+    @Autowired
+    RegisterResponse registerResponse;
+    @Autowired
+    UpdateUserStatus updateUserStatus;
+    @Autowired
+    UpdatePasswordStatus updatePasswordStatus;
+    private static final String SUCCESS = "Success";
+    private static final String FAIL = "Fail";
     @Autowired
     private ObjectMapper mapper;
     
@@ -30,22 +44,21 @@ public class UserDetailsService{
         }
     }
     
-    public String registerUser(UserDetailsModel userDetailRequest) {
+    public RegisterResponse registerUser(UserDetailsModel userDetailRequest) {
         JSONObject checkEmailObject = checkUniqueEmail(userDetailRequest.getEmail());
-        ObjectNode response = mapper.createObjectNode();
         if(checkEmailObject.get("ifEmailExists").equals("false")) {
             UserDetailsModel registerUserData = userDetailsRepository.save(userDetailRequest);
             System.out.println("registerUserData is "+registerUserData);
             if(registerUserData == null) {
-                response.put("registrationStatusMessage","Fail");
+                registerResponse.setRegistrationStatusMessage(FAIL);
             }else {
-                response.put("registrationStatusMessage","Success");
-                response.put("id", registerUserData.getId());
+                registerResponse.setRegistrationStatusMessage(SUCCESS);
+                registerResponse.setId(registerUserData.getId());
             }
         }else {
-            response.put("registrationStatusMessage","User already exists");
+            registerResponse.setRegistrationStatusMessage("User already exists");
         }
-        return response.toString();
+        return registerResponse;
     }
 
     public JSONObject checkUniqueEmail(String email) {
@@ -58,42 +71,40 @@ public class UserDetailsService{
         return response;
     }
 
-    public String checkCredentials(UserDetailsModel userDetailRequest) {
+    public LoginResponse checkCredentials(UserDetailsModel userDetailRequest) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        ObjectNode response = mapper.createObjectNode();
         UserDetailsModel userDetails = userDetailsRepository.getUserDetailsEmail(userDetailRequest.getEmail());
         if(userDetails !=null) {
             Boolean isPasswordMatched = encoder.matches(userDetailRequest.getPassword(), userDetails.getPassword());
             if(isPasswordMatched == true) {
-                response.put("id", userDetails.getId());
-                response.put("loginStatusMessage", "Success");
+                loginResponse.setId(userDetails.getId());
+                loginResponse.setLoginStatusMessage(SUCCESS);
             }else {
-                response.put("loginStatusMessage", "Invalid Pwd");
+                loginResponse.setLoginStatusMessage("Invalid Pwd");
             }
         } else {
-            response.put("loginStatusMessage", "Fail");
+            loginResponse.setLoginStatusMessage(FAIL);
         }
-        return response.toString();
+        return loginResponse;
     }
 
     public UserDetailsModel findById(long id) {
         return userDetailsRepository.findUserById(id);
     }
     @Transactional
-    public String updateUser(UserDetailsModel userDetailRequest) {
+    public UpdateUserStatus updateUser(UserDetailsModel userDetailRequest) {
         System.out.println("userDetailrequest "+findById(userDetailRequest.getId()));
-        ObjectNode response = mapper.createObjectNode();
         if(findById(userDetailRequest.getId()) != null) {
-            int updateStatus = userDetailsRepository.updateUserInfo(userDetailRequest.getId(),userDetailRequest.getFirstName(),userDetailRequest.getLastName(),userDetailRequest.getGender(),userDetailRequest.getMobileNo(),userDetailRequest.getDeliveryId(),userDetailRequest.getAccountId());
-            if(updateStatus == 1) {
-                response.put("updateStatus","Success");
+            int updateFlag = userDetailsRepository.updateUserInfo(userDetailRequest.getId(),userDetailRequest.getFirstName(),userDetailRequest.getLastName(),userDetailRequest.getGender(),userDetailRequest.getMobileNo(),userDetailRequest.getDeliveryId(),userDetailRequest.getAccountId());
+            if(updateFlag == 1) {
+                updateUserStatus.setUpdateStatus(SUCCESS);
             }else {
-                response.put("updateStatus","Fail");
+                updateUserStatus.setUpdateStatus(FAIL);
             }
         } else {
-            response.put("updateStatus","Invalid User");
+            updateUserStatus.setUpdateStatus("Invalid User");
         }
-        return response.toString();
+        return updateUserStatus;
     }
     @Transactional
     public String DeletUserInfo(long id) {
@@ -108,18 +119,17 @@ public class UserDetailsService{
     }
 
     @Transactional
-    public String changePassword(UserDetailsModel userDetailRequest) {
-        ObjectNode response = mapper.createObjectNode();
+    public UpdatePasswordStatus changePassword(UserDetailsModel userDetailRequest) {
         if(findById(userDetailRequest.getId()) != null) {
             int updateStatus = userDetailsRepository.changePassword(userDetailRequest.getId(),userDetailRequest.getPassword());
             if(updateStatus == 1) {
-                response.put("updateStatus","Success");
+                updatePasswordStatus.setUpdatePasswordStatus(SUCCESS);
             }else {
-                response.put("updateStatus","Fail");
+                updatePasswordStatus.setUpdatePasswordStatus(FAIL);
             }
         } else {
-            response.put("updateStatus","Invalid User");
+            updatePasswordStatus.setUpdatePasswordStatus("Invalid User");
         }
-        return response.toString();
+        return updatePasswordStatus;
     }
 }

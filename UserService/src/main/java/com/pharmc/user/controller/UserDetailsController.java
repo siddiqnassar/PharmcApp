@@ -34,7 +34,6 @@ public class UserDetailsController {
     }
     @PutMapping("/")
     public ResponseEntity<String> updateUser(@RequestBody UserDetailsModel userDetailRequest){
-        //userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
         return new ResponseEntity<String>(userDetailsService.updateUser(userDetailRequest).toString(), HttpStatus.OK);
     }
     @PutMapping("/changepwd")
@@ -44,8 +43,6 @@ public class UserDetailsController {
     }
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserDetailsModel userDetailRequest){
-        userDetailRequest.setAccountId(1);
-        userDetailRequest.setDeliveryId(1);
         return new ResponseEntity<String>(userDetailsService.checkCredentials(userDetailRequest).toString(), HttpStatus.OK);
     }
     @DeleteMapping("/delete/{id}")
