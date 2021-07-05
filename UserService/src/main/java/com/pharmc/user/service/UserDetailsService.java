@@ -80,10 +80,10 @@ public class UserDetailsService{
                 loginResponse.setId(userDetails.getId());
                 loginResponse.setLoginStatusMessage(SUCCESS);
             }else {
-                loginResponse.setLoginStatusMessage("Invalid Pwd");
+                loginResponse.setLoginStatusMessage("Invalid Password");
             }
         } else {
-            loginResponse.setLoginStatusMessage(FAIL);
+            loginResponse.setLoginStatusMessage("Email didnot exists");
         }
         return loginResponse;
     }

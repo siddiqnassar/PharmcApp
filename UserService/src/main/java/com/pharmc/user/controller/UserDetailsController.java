@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class UserDetailsController {
     public ResponseEntity<String> getUser(@PathVariable long id){
         return new ResponseEntity<String>(userDetailsService.getDetailsById(id).toString(), HttpStatus.OK);
     }
+    @CrossOrigin(origins = "*")
     @PostMapping("/")
     public ResponseEntity<String> registerUser(@RequestBody UserDetailsModel userDetailRequest){
         userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
@@ -41,6 +43,7 @@ public class UserDetailsController {
         userDetailRequest.setPassword(new BCryptPasswordEncoder(10).encode(userDetailRequest.getPassword()));
         return new ResponseEntity<String>(userDetailsService.changePassword(userDetailRequest).toString(), HttpStatus.OK);
     }
+    @CrossOrigin(origins = "*")
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserDetailsModel userDetailRequest){
         return new ResponseEntity<String>(userDetailsService.checkCredentials(userDetailRequest).toString(), HttpStatus.OK);
